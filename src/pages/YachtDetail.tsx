@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,7 @@ interface YachtDetail {
 
 export const YachtDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const { t, language } = useLanguage();
   const [yacht, setYacht] = useState<YachtDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,7 +44,7 @@ export const YachtDetail: React.FC = () => {
       if (!id) return;
 
       try {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('yachts')
           .select(`
             *,
@@ -62,16 +63,12 @@ export const YachtDetail: React.FC = () => {
           .eq('is_active', true)
           .single();
 
-        if (error) throw error;
-        
         if (data) {
           // Sort images by display_order
           if (data.yacht_images) {
             data.yacht_images.sort((a, b) => a.display_order - b.display_order);
           }
           setYacht(data);
-        } else {
-          setYacht(null);
         }
       } catch (error) {
         console.error('Error fetching yacht:', error);
@@ -81,7 +78,7 @@ export const YachtDetail: React.FC = () => {
     };
 
     fetchYacht();
-  }, [id]);
+  }, [id, location.pathname]); // Using location.pathname ensures reload on URL changes
 
   const handleWhatsAppContact = () => {
     if (!yacht) return;
