@@ -96,7 +96,7 @@ export const YachtDetail: React.FC = () => {
     const yachtName = language === 'ar' ? yacht.name_ar : yacht.name_en;
     const subject = encodeURIComponent(`Yacht Booking Inquiry - ${yachtName}`);
     const body = encodeURIComponent(`Hi,\n\nI'm interested in booking the ${yachtName} yacht. Please provide more details and availability.\n\nThank you!`);
-    window.open(`mailto:alinasreldin783@gmail.com?subject=${subject}&body=${body}`, '_self');
+    window.open(`mailto:elsokhnayatch@gmail.com?subject=${subject}&body=${body}`, '_self');
   };
 
   if (loading) {
