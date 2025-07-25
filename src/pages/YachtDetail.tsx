@@ -251,7 +251,7 @@ export const YachtDetail: React.FC = () => {
                     className="w-full bg-green-600 hover:bg-green-700 text-white"
                   >
                     <MessageCircle className="w-5 h-5 mr-2" />
-                    {t('whatsapp', 'WhatsApp: 01158954215', 'واتساب: 01158954215')}
+                    {t('whatsapp', 'WhatsApp: 01064283248', 'واتساب: 01064283248')}
                   </Button>
 
                   <Button
@@ -260,7 +260,7 @@ export const YachtDetail: React.FC = () => {
                     className="w-full"
                   >
                     <Phone className="w-5 h-5 mr-2" />
-                    {t('phone', 'Phone: 01158954215', 'هاتف: 01158954215')}
+                    {t('phone', 'Phone: 01064283248', 'هاتف: 01064283248')}
                   </Button>
 
                   <Button
