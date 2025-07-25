@@ -20,16 +20,34 @@ import { AdminLogin } from "./pages/AdminLogin";
 import { AdminPanel } from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5, // 5 دقائق للبيانات القديمة
+    },
+  },
+});
 
 function ScrollToTopOnRouteChange() {
-  const location = useLocation();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [location.pathname]);
+  }, [pathname]);
 
   return null;
+}
+
+function RouteWrapper({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  
+  useEffect(() => {
+    // إعادة تحميل البيانات عند تغيير المسار
+    queryClient.invalidateQueries();
+  }, [location.pathname]);
+
+  return <>{children}</>;
 }
 
 const App = () => {
@@ -41,16 +59,44 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <ScrollToTopOnRouteChange /> {/* ✅ هنا */}
+              <ScrollToTopOnRouteChange />
               <div className="min-h-screen flex flex-col">
                 <Header />
                 <main className="flex-1">
                   <Routes>
                     <Route path="/" element={<Home />} />
-                    <Route path="/yachts" element={<YachtsList />} />
-                    <Route path="/yacht/:id" element={<YachtDetail />} />
-                    <Route path="/locations" element={<LocationsList />} />
-                    <Route path="/location/:id" element={<LocationDetail />} />
+                    <Route 
+                      path="/yachts" 
+                      element={
+                        <RouteWrapper>
+                          <YachtsList />
+                        </RouteWrapper>
+                      } 
+                    />
+                    <Route 
+                      path="/yacht/:id" 
+                      element={
+                        <RouteWrapper>
+                          <YachtDetail />
+                        </RouteWrapper>
+                      } 
+                    />
+                    <Route 
+                      path="/locations" 
+                      element={
+                        <RouteWrapper>
+                          <LocationsList />
+                        </RouteWrapper>
+                      } 
+                    />
+                    <Route 
+                      path="/location/:id" 
+                      element={
+                        <RouteWrapper>
+                          <LocationDetail />
+                        </RouteWrapper>
+                      } 
+                    />
                     <Route path="/admin-login" element={<AdminLogin />} />
                     <Route path="/admin" element={<AdminPanel />} />
                     <Route path="*" element={<NotFound />} />
