@@ -43,7 +43,7 @@ export const YachtDetail: React.FC = () => {
       if (!id) return;
 
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('yachts')
           .select(`
             *,
@@ -62,12 +62,16 @@ export const YachtDetail: React.FC = () => {
           .eq('is_active', true)
           .single();
 
+        if (error) throw error;
+        
         if (data) {
           // Sort images by display_order
           if (data.yacht_images) {
             data.yacht_images.sort((a, b) => a.display_order - b.display_order);
           }
           setYacht(data);
+        } else {
+          setYacht(null);
         }
       } catch (error) {
         console.error('Error fetching yacht:', error);
