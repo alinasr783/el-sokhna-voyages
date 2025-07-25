@@ -83,11 +83,11 @@ export const YachtDetail: React.FC = () => {
     if (!yacht) return;
     const yachtName = language === 'ar' ? yacht.name_ar : yacht.name_en;
     const message = encodeURIComponent(`Hi! I'm interested in booking the ${yachtName} yacht. Can you provide more details?`);
-    window.open(`https://wa.me/201158954215?text=${message}`, '_blank');
+    window.open(`https://wa.me/201064283248?text=${message}`, '_blank');
   };
 
   const handlePhoneCall = () => {
-    window.open('tel:01158954215', '_self');
+    window.open('tel:01064283248', '_self');
   };
 
   const handleEmailContact = () => {
