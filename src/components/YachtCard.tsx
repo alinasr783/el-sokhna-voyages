@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, MessageCircle, Phone, Mail, MapPin, Star } from 'lucide-react';
 
+
 interface YachtDetail {
   id: string;
   name_en: string;
