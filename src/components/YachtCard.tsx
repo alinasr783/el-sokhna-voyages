@@ -46,7 +46,7 @@ export const YachtCard: React.FC<YachtCardProps> = ({ yacht }) => {
   };
 
   return (
-    <Card className="overflow-hidden shadow-card hover:shadow-luxury transition-all duration-500 group bg-gradient-card">
+    <Card className="overflow-hidden shadow-card hover:shadow-luxury transition-all duration-500 group bg-gradient-card card-hover">
       <div className="relative overflow-hidden">
         {primaryImage && (
           <img

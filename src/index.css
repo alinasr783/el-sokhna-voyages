@@ -8,55 +8,58 @@
 
 @layer base {
   :root {
-    /* Ocean-inspired luxury palette */
-    --background: 220 15% 98%;
-    --foreground: 220 13% 18%;
+    /* Refined ocean luxury palette */
+    --background: 215 25% 97%;
+    --foreground: 215 25% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 13% 18%;
+    --card-foreground: 215 25% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 13% 18%;
+    --popover-foreground: 215 25% 15%;
 
-    /* Deep ocean blue as primary */
-    --primary: 220 91% 25%;
+    /* Deep sapphire blue as primary */
+    --primary: 212 95% 28%;
     --primary-foreground: 0 0% 98%;
-    --primary-light: 220 91% 35%;
-    --primary-dark: 220 91% 15%;
+    --primary-light: 212 85% 45%;
+    --primary-dark: 212 95% 18%;
 
-    /* Elegant gold accents */
-    --secondary: 43 84% 65%;
-    --secondary-foreground: 220 13% 18%;
+    /* Warm gold accent */
+    --secondary: 38 92% 58%;
+    --secondary-foreground: 215 25% 15%;
 
-    /* Soft neutrals */
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 46%;
+    /* Soft sophisticated neutrals */
+    --muted: 215 20% 94%;
+    --muted-foreground: 215 15% 45%;
 
     /* Refined accent */
-    --accent: 220 14% 95%;
-    --accent-foreground: 220 13% 18%;
+    --accent: 215 25% 92%;
+    --accent-foreground: 215 25% 15%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 94%;
-    --ring: 220 91% 25%;
+    --border: 215 20% 88%;
+    --input: 215 20% 92%;
+    --ring: 212 95% 28%;
 
-    /* Luxury gradients */
-    --gradient-ocean: linear-gradient(135deg, hsl(220 91% 25%), hsl(220 91% 35%));
-    --gradient-sunset: linear-gradient(135deg, hsl(43 84% 65%), hsl(39 85% 75%));
-    --gradient-hero: linear-gradient(135deg, hsl(220 91% 25% / 0.9), hsl(220 91% 15% / 0.95));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(220 14% 98%));
+    /* Enhanced luxury gradients */
+    --gradient-ocean: linear-gradient(135deg, hsl(212 95% 28%), hsl(212 85% 45%));
+    --gradient-sunset: linear-gradient(135deg, hsl(38 92% 58%), hsl(45 90% 70%));
+    --gradient-hero: linear-gradient(135deg, hsl(212 95% 28% / 0.92), hsl(212 95% 18% / 0.96));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(215 25% 96%));
+    --gradient-hover: linear-gradient(135deg, hsl(212 85% 45%), hsl(212 75% 55%));
 
-    /* Shadows */
-    --shadow-luxury: 0 20px 40px -12px hsl(220 91% 25% / 0.15);
-    --shadow-card: 0 8px 32px -8px hsl(220 91% 25% / 0.12);
-    --shadow-elegant: 0 4px 20px -4px hsl(220 91% 25% / 0.1);
+    /* Elegant shadows */
+    --shadow-luxury: 0 25px 50px -12px hsl(212 95% 28% / 0.18);
+    --shadow-card: 0 10px 35px -8px hsl(212 95% 28% / 0.15);
+    --shadow-elegant: 0 6px 25px -4px hsl(212 95% 28% / 0.12);
+    --shadow-button: 0 4px 15px -2px hsl(212 95% 28% / 0.2);
 
-    /* Animations */
+    /* Smooth transitions */
     --transition-luxury: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
     --radius: 0.75rem;
 
@@ -132,5 +135,51 @@
 
   .font-latin {
     font-family: 'Inter', sans-serif;
+  }
+
+  /* Enhanced hover animations */
+  .hover-lift {
+    @apply transition-all duration-300 ease-luxury;
+  }
+
+  .hover-lift:hover {
+    @apply -translate-y-1 shadow-luxury;
+  }
+
+  .button-hover {
+    @apply transition-all duration-300 ease-luxury;
+    background-size: 100% 100%;
+  }
+
+  .button-hover:hover {
+    @apply shadow-button scale-105;
+    background-size: 110% 110%;
+  }
+
+  /* Card hover effects */
+  .card-hover {
+    @apply transition-all duration-500 ease-luxury;
+  }
+
+  .card-hover:hover {
+    @apply -translate-y-2 shadow-luxury;
+  }
+
+  /* Link hover with proper contrast */
+  .link-hover {
+    @apply relative transition-all duration-300 ease-luxury;
+  }
+
+  .link-hover::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300;
+  }
+
+  .link-hover:hover::after {
+    @apply w-full;
+  }
+
+  .link-hover:hover {
+    @apply text-primary;
   }
 }

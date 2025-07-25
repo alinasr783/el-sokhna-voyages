@@ -24,7 +24,7 @@ export const LocationCard: React.FC<LocationCardProps> = ({ location, yachtCount
   const locationDescription = language === 'ar' ? location.description_ar : location.description_en;
 
   return (
-    <Card className="overflow-hidden shadow-card hover:shadow-luxury transition-all duration-500 group bg-gradient-card">
+    <Card className="overflow-hidden shadow-card hover:shadow-luxury transition-all duration-500 group bg-gradient-card card-hover">
       <div className="relative overflow-hidden">
         {location.image_url && (
           <img

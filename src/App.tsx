@@ -13,6 +13,7 @@ import { YachtsList } from "./pages/YachtsList";
 import { LocationsList } from "./pages/LocationsList";
 import { LocationDetail } from "./pages/LocationDetail";
 import { AdminLogin } from "./pages/AdminLogin";
+import { AdminPanel } from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
                   <Route path="/locations" element={<LocationsList />} />
                   <Route path="/location/:id" element={<LocationDetail />} />
                   <Route path="/admin-login" element={<AdminLogin />} />
+                  <Route path="/admin" element={<AdminPanel />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

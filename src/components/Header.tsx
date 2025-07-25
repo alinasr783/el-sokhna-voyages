@@ -28,19 +28,19 @@ export const Header: React.FC = () => {
         <nav className="hidden md:flex items-center space-x-6">
           <Link 
             to="/" 
-            className="hover:text-secondary transition-colors"
+            className="link-hover"
           >
             {t('home', 'Home', 'الرئيسية')}
           </Link>
           <Link 
             to="/yachts" 
-            className="hover:text-secondary transition-colors"
+            className="link-hover"
           >
             {t('yachts', 'Yachts', 'اليخوت')}
           </Link>
           <Link 
             to="/locations" 
-            className="hover:text-secondary transition-colors"
+            className="link-hover"
           >
             {t('locations', 'Locations', 'المواقع')}
           </Link>
