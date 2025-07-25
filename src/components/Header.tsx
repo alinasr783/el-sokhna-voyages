@@ -28,19 +28,19 @@ export const Header: React.FC = () => {
         <nav className="hidden md:flex items-center space-x-6">
           <Link 
             to="/" 
-            className="link-hover"
+            className="text-white/90 hover:text-white transition-colors font-medium"
           >
             {t('home', 'Home', 'الرئيسية')}
           </Link>
           <Link 
             to="/yachts" 
-            className="link-hover"
+            className="text-white/90 hover:text-white transition-colors font-medium"
           >
             {t('yachts', 'Yachts', 'اليخوت')}
           </Link>
           <Link 
             to="/locations" 
-            className="link-hover"
+            className="text-white/90 hover:text-white transition-colors font-medium"
           >
             {t('locations', 'Locations', 'المواقع')}
           </Link>
@@ -48,21 +48,6 @@ export const Header: React.FC = () => {
 
         <div className="flex items-center space-x-4">
           <LanguageSwitcher />
-          
-          {isAdmin && (
-            <div className="flex items-center space-x-2">
-              <Link to="/admin">
-                <Button variant="secondary" size="sm">
-                  <Settings className="w-4 h-4 mr-2" />
-                  {t('admin', 'Admin', 'الإدارة')}
-                </Button>
-              </Link>
-              <Button variant="outline" size="sm" onClick={handleSignOut}>
-                <LogOut className="w-4 h-4 mr-2" />
-                {t('signout', 'Sign Out', 'تسجيل الخروج')}
-              </Button>
-            </div>
-          )}
         </div>
       </div>
     </header>
