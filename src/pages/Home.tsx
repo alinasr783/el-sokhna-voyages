@@ -43,7 +43,6 @@ export const Home: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch featured yachts with images
         const { data: yachtsData } = await supabase
           .from('yachts')
           .select(`
@@ -60,7 +59,6 @@ export const Home: React.FC = () => {
           .order('created_at', { ascending: false })
           .limit(6);
 
-        // Fetch locations
         const { data: locationsData } = await supabase
           .from('locations')
           .select('*')
@@ -68,7 +66,6 @@ export const Home: React.FC = () => {
           .order('created_at', { ascending: false })
           .limit(6);
 
-        // Fetch yacht counts per location
         const { data: yachtCountsData } = await supabase
           .from('yachts')
           .select('location_id')
@@ -132,7 +129,11 @@ export const Home: React.FC = () => {
               </Button>
             </Link>
             <Link to="/locations">
-              <Button size="lg" variant="outline" className="text-lg px-8 py-3 border-white text-white hover:bg-white hover:text-primary">
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-lg px-8 py-3 border-white text-primary hover:bg-white hover:text-primary"
+              >
                 {t('browse-locations', 'Browse Locations', 'تصفح المواقع')}
                 <MapPin className="ml-2 w-5 h-5" />
               </Button>
