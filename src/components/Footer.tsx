@@ -29,11 +29,11 @@ export const Footer: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <Phone className="w-5 h-5 text-secondary" />
-                <span>01158954215</span>
+                <span>01064283248</span>
               </div>
               <div className="flex items-center space-x-3">
                 <MessageCircle className="w-5 h-5 text-secondary" />
-                <span>01158954215</span>
+                <span>01064283248</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="w-5 h-5 text-secondary" />
@@ -62,7 +62,7 @@ export const Footer: React.FC = () => {
 
         <div className="border-t border-primary-foreground/20 pt-8 mt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-primary-foreground/60 text-sm">
-            © 2024 ELSOKHNA. {t('rights', 'All rights reserved.', 'جميع الحقوق محفوظة.')}
+            © 2025 ELSOKHNA. {t('rights', 'All rights reserved.', 'جميع الحقوق محفوظة.')}
           </p>
           
           <Link 
