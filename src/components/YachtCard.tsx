@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { MessageCircle, Phone, Mail } from 'lucide-react';
 
+
 interface YachtCardProps {
   yacht: {
     id: string;
