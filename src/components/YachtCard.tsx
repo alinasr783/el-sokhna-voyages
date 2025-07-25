@@ -5,7 +5,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { MessageCircle, Phone, Mail } from 'lucide-react';
 
-
 interface YachtCardProps {
   yacht: {
     id: string;
@@ -32,18 +31,18 @@ export const YachtCard: React.FC<YachtCardProps> = ({ yacht }) => {
   const primaryImage = yacht.yacht_images?.[0];
 
   const handleWhatsAppContact = () => {
-  const message = encodeURIComponent(`Hi! I'm interested in booking the ${yachtName} yacht. Can you provide more details?`);
-    window.open(`https://wa.me/201064283248?text=${message}`, '_blank'); // ✅ واتساب
+    const message = encodeURIComponent(`Hi! I'm interested in booking the ${yachtName} yacht. Can you provide more details?`);
+    window.open(`https://wa.me/201064283248?text=${message}`, '_blank');
   };
 
   const handlePhoneCall = () => {
-    window.open('tel:01064283248', '_self'); // ✅ مكالمة
+    window.open('tel:01064283248', '_self');
   };
 
   const handleEmailContact = () => {
     const subject = encodeURIComponent(`Yacht Booking Inquiry - ${yachtName}`);
     const body = encodeURIComponent(`Hi,\n\nI'm interested in booking the ${yachtName} yacht. Please provide more details and availability.\n\nThank you!`);
-    window.open(`mailto:alinasreldin783@gmail.com?subject=${subject}&body=${body}`, '_self'); // ✅ الإيميل زي ما هو
+    window.open(`mailto:alinasreldin783@gmail.com?subject=${subject}&body=${body}`, '_self');
   };
 
   return (
