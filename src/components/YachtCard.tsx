@@ -31,18 +31,18 @@ export const YachtCard: React.FC<YachtCardProps> = ({ yacht }) => {
   const primaryImage = yacht.yacht_images?.[0];
 
   const handleWhatsAppContact = () => {
-    const message = encodeURIComponent(`Hi! I'm interested in booking the ${yachtName} yacht. Can you provide more details?`);
-    window.open(`https://wa.me/201158954215?text=${message}`, '_blank');
+  const message = encodeURIComponent(`Hi! I'm interested in booking the ${yachtName} yacht. Can you provide more details?`);
+    window.open(`https://wa.me/201064283248?text=${message}`, '_blank'); // ✅ واتساب
   };
 
   const handlePhoneCall = () => {
-    window.open('tel:01158954215', '_self');
+    window.open('tel:01064283248', '_self'); // ✅ مكالمة
   };
 
   const handleEmailContact = () => {
     const subject = encodeURIComponent(`Yacht Booking Inquiry - ${yachtName}`);
     const body = encodeURIComponent(`Hi,\n\nI'm interested in booking the ${yachtName} yacht. Please provide more details and availability.\n\nThank you!`);
-    window.open(`mailto:alinasreldin783@gmail.com?subject=${subject}&body=${body}`, '_self');
+    window.open(`mailto:alinasreldin783@gmail.com?subject=${subject}&body=${body}`, '_self'); // ✅ الإيميل زي ما هو
   };
 
   return (
