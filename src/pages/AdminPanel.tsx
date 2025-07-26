@@ -51,11 +51,22 @@ interface Yacht {
   }>;
 }
 
+interface Article {
+  id: string;
+  title_en: string;
+  title_ar: string;
+  content_en?: string;
+  content_ar?: string;
+  main_image_url?: string;
+  is_active: boolean;
+}
+
 export const AdminPanel: React.FC = () => {
   const { isAdmin, loading } = useAuth();
   const { t } = useLanguage();
   const [locations, setLocations] = useState<Location[]>([]);
   const [yachts, setYachts] = useState<Yacht[]>([]);
+  const [articles, setArticles] = useState<Article[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -84,6 +95,17 @@ export const AdminPanel: React.FC = () => {
   });
   const [editingYacht, setEditingYacht] = useState<string | null>(null);
 
+  // Article form states
+  const [articleForm, setArticleForm] = useState({
+    title_en: '',
+    title_ar: '',
+    content_en: '',
+    content_ar: '',
+    main_image_url: ''
+  });
+  const [editingArticle, setEditingArticle] = useState<string | null>(null);
+  const [articleImageFile, setArticleImageFile] = useState<File | null>(null);
+
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
 
   useEffect(() => {
@@ -92,19 +114,22 @@ export const AdminPanel: React.FC = () => {
     }
   }, [isAdmin]);
 
-  const fetchData = async () => {
+  type FetchDataType = () => Promise<void>;
+  const fetchData: FetchDataType = async () => {
     try {
-      const [locationsResult, yachtsResult] = await Promise.all([
+      const [locationsResult, yachtsResult, articlesResult] = await Promise.all([
         supabase.from('locations').select('*').order('created_at', { ascending: false }),
         supabase.from('yachts').select(`
           *,
           locations (name_en, name_ar),
           yacht_images (id, image_url, alt_text_en, alt_text_ar, display_order)
-        `).order('created_at', { ascending: false })
+        `).order('created_at', { ascending: false }),
+        supabase.from('articles').select('*').order('created_at', { ascending: false })
       ]);
 
       setLocations(locationsResult.data || []);
       setYachts(yachtsResult.data || []);
+      setArticles(articlesResult.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -325,6 +350,75 @@ export const AdminPanel: React.FC = () => {
     }
   };
 
+  // Article CRUD handlers
+  const resetArticleForm = () => {
+    setArticleForm({
+      title_en: '',
+      title_ar: '',
+      content_en: '',
+      content_ar: '',
+      main_image_url: ''
+    });
+    setEditingArticle(null);
+    setArticleImageFile(null);
+  };
+
+  const editArticle = (article: Article) => {
+    setArticleForm({
+      title_en: article.title_en,
+      title_ar: article.title_ar,
+      content_en: article.content_en || '',
+      content_ar: article.content_ar || '',
+      main_image_url: article.main_image_url || ''
+    });
+    setEditingArticle(article.id);
+    setArticleImageFile(null);
+  };
+
+  const deleteArticle = async (id: string) => {
+    if (!confirm(t('confirm-delete-article', 'Are you sure you want to delete this article?', 'هل أنت متأكد من حذف هذا المقال؟'))) return;
+    try {
+      const { error } = await supabase.from('articles').update({ is_active: false }).eq('id', id);
+      if (error) throw error;
+      showMessage('success', t('article-deleted', 'Article deleted successfully', 'تم حذف المقال بنجاح'));
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting article:', error);
+      showMessage('error', t('error-deleting', 'Error deleting article', 'خطأ في حذف المقال'));
+    }
+  };
+
+  const handleArticleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      let main_image_url = articleForm.main_image_url;
+      // Upload image if selected
+      if (articleImageFile) {
+        const fileExt = articleImageFile.name.split('.').pop();
+        const fileName = `article_${Date.now()}.${fileExt}`;
+        const filePath = `articles/${fileName}`;
+        const { error: uploadError } = await supabase.storage.from('articles').upload(filePath, articleImageFile);
+        if (uploadError) throw uploadError;
+        const { data: urlData } = supabase.storage.from('articles').getPublicUrl(filePath);
+        main_image_url = urlData.publicUrl;
+      }
+      if (editingArticle) {
+        const { error } = await supabase.from('articles').update({ ...articleForm, main_image_url }).eq('id', editingArticle);
+        if (error) throw error;
+        showMessage('success', t('article-updated', 'Article updated successfully', 'تم تحديث المقال بنجاح'));
+      } else {
+        const { error } = await supabase.from('articles').insert([{ ...articleForm, main_image_url }]);
+        if (error) throw error;
+        showMessage('success', t('article-created', 'Article created successfully', 'تم إنشاء المقال بنجاح'));
+      }
+      resetArticleForm();
+      fetchData();
+    } catch (error) {
+      console.error('Error saving article:', error);
+      showMessage('error', t('error-saving', 'Error saving article', 'خطأ في حفظ المقال'));
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -372,7 +466,7 @@ export const AdminPanel: React.FC = () => {
         )}
 
         <Tabs defaultValue="locations" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3"> {/* changed from 2 to 3 */}
             <TabsTrigger value="locations" className="flex items-center space-x-2">
               <MapPin className="w-4 h-4" />
               <span>{t('locations', 'Locations', 'المواقع')}</span>
@@ -380,6 +474,10 @@ export const AdminPanel: React.FC = () => {
             <TabsTrigger value="yachts" className="flex items-center space-x-2">
               <Anchor className="w-4 h-4" />
               <span>{t('yachts', 'Yachts', 'اليخوت')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="articles" className="flex items-center space-x-2">
+              <Upload className="w-4 h-4" />
+              <span>{t('articles', 'Articles', 'المقالات')}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -717,6 +815,118 @@ export const AdminPanel: React.FC = () => {
                           onClick={() => deleteYacht(yacht.id)}
                           className="text-destructive hover:text-destructive"
                         >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Articles Tab */}
+          <TabsContent value="articles" className="space-y-6">
+            {/* Add/Edit Article Form */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Plus className="w-5 h-5" />
+                  <span>
+                    {editingArticle
+                      ? t('edit-article', 'Edit Article', 'تعديل المقال')
+                      : t('add-article', 'Add New Article', 'إضافة مقال جديد')}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleArticleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="title_en">{t('title-english', 'Title (English)', 'العنوان (إنجليزي)')}</Label>
+                      <Input
+                        id="title_en"
+                        value={articleForm.title_en}
+                        onChange={e => setArticleForm({ ...articleForm, title_en: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="title_ar">{t('title-arabic', 'Title (Arabic)', 'العنوان (عربي)')}</Label>
+                      <Input
+                        id="title_ar"
+                        value={articleForm.title_ar}
+                        onChange={e => setArticleForm({ ...articleForm, title_ar: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="content_en">{t('content-english', 'Content (English)', 'المحتوى (إنجليزي)')}</Label>
+                      <Textarea
+                        id="content_en"
+                        value={articleForm.content_en}
+                        onChange={e => setArticleForm({ ...articleForm, content_en: e.target.value })}
+                        rows={5}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="content_ar">{t('content-arabic', 'Content (Arabic)', 'المحتوى (عربي)')}</Label>
+                      <Textarea
+                        id="content_ar"
+                        value={articleForm.content_ar}
+                        onChange={e => setArticleForm({ ...articleForm, content_ar: e.target.value })}
+                        rows={5}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="main_image_url">{t('main-image', 'Main Image', 'الصورة الرئيسية')}</Label>
+                    <Input
+                      id="main_image_url"
+                      type="file"
+                      accept="image/*"
+                      onChange={e => setArticleImageFile(e.target.files?.[0] || null)}
+                    />
+                    {articleForm.main_image_url && !articleImageFile && (
+                      <img src={articleForm.main_image_url} alt="Current" className="mt-2 rounded w-32 h-20 object-cover" />
+                    )}
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button type="submit" className="bg-gradient-ocean">
+                      {editingArticle ? t('update', 'Update', 'تحديث') : t('create', 'Create', 'إنشاء')}
+                    </Button>
+                    {editingArticle && (
+                      <Button type="button" variant="outline" onClick={resetArticleForm}>
+                        {t('cancel', 'Cancel', 'إلغاء')}
+                      </Button>
+                    )}
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+            {/* Articles List */}
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('existing-articles', 'Existing Articles', 'المقالات الموجودة')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {articles.filter(a => a.is_active !== false).map(article => (
+                    <div key={article.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex-1">
+                        <h3 className="font-semibold">{article.title_en} / {article.title_ar}</h3>
+                        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{article.content_en}</p>
+                        {article.main_image_url && (
+                          <img src={article.main_image_url} alt="" className="mt-2 rounded w-24 h-16 object-cover" />
+                        )}
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button variant="outline" size="sm" onClick={() => editArticle(article)}>
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => deleteArticle(article.id)} className="text-destructive hover:text-destructive">
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
