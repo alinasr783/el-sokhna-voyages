@@ -1,52 +1,58 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
-export type Language = 'en' | 'ar';
+type Language = 'en' | 'ar'
 
 interface LanguageContextType {
-  language: Language;
-  setLanguage: (lang: Language) => void;
-  t: (key: string, enText: string, arText: string) => string;
-  dir: string;
-  isRTL: boolean;
+  language: Language
+  setLanguage: (lang: Language) => void
+  isRTL: boolean
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 export const useLanguage = () => {
-  const context = useContext(LanguageContext);
-  if (!context) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
+  const context = useContext(LanguageContext)
+  if (context === undefined) {
+    throw new Error('useLanguage must be used within a LanguageProvider')
   }
-  return context;
-};
+  return context
+}
 
 interface LanguageProviderProps {
-  children: ReactNode;
+  children: ReactNode
 }
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('en');
+  const [language, setLanguageState] = useState<Language>('en')
 
-  const t = (key: string, enText: string, arText: string) => {
-    return language === 'ar' ? arText : enText;
-  };
+  useEffect(() => {
+    // Load language from localStorage
+    const savedLanguage = localStorage.getItem('language') as Language
+    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'ar')) {
+      setLanguageState(savedLanguage)
+    }
+  }, [])
 
-  const dir = language === 'ar' ? 'rtl' : 'ltr';
-  const isRTL = language === 'ar';
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang)
+    localStorage.setItem('language', lang)
+    
+    // Update document direction
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
+    document.documentElement.lang = lang
+  }
 
-  const value = {
-    language,
-    setLanguage,
-    t,
-    dir,
-    isRTL,
-  };
+  const isRTL = language === 'ar'
+
+  useEffect(() => {
+    // Set initial document direction
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr'
+    document.documentElement.lang = language
+  }, [isRTL, language])
 
   return (
-    <LanguageContext.Provider value={value}>
-      <div dir={dir} className={isRTL ? 'font-arabic' : 'font-latin'}>
-        {children}
-      </div>
+    <LanguageContext.Provider value={{ language, setLanguage, isRTL }}>
+      {children}
     </LanguageContext.Provider>
-  );
-};
+  )
+}
