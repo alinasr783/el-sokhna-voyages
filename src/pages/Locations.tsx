@@ -1,73 +1,45 @@
-import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
-import { useTranslation, translations } from '../lib/translations'
-import { supabase, Location } from '../lib/supabase'
+import { useTranslation } from '../lib/translations'
+import { countries } from '../lib/countries'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
-import { MapPin, Search, Anchor } from 'lucide-react'
+import { Search, GraduationCap, School, BookOpen } from 'lucide-react'
 
 export const Locations: React.FC = () => {
   const { language, isRTL } = useLanguage()
   const { t } = useTranslation()
-  const [locations, setLocations] = useState<Location[]>([])
-  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
 
-  useEffect(() => {
-    const fetchLocations = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('locations')
-          .select('*')
-          .order('name_en', { ascending: true })
-
-        if (error) {
-          console.error('Error fetching locations:', error)
-          return
-        }
-
-        setLocations(data || [])
-      } catch (error) {
-        console.error('Error fetching locations:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchLocations()
-  }, [])
-
-  const filteredLocations = locations.filter(location => {
-    return searchTerm === '' || 
-      location.name_en.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      location.name_ar.includes(searchTerm) ||
-      location.description_en?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      location.description_ar?.includes(searchTerm)
-  })
-
-  if (loading) {
+  const filteredCountries = countries.filter(country => {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">{t(translations.loading.en, translations.loading.ar)}</div>
-      </div>
+      country.en.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      country.ar.includes(searchTerm) ||
+      country.description_en.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      country.description_ar.includes(searchTerm) ||
+      country.universities.some(u =>
+        u.en.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.ar.includes(searchTerm) ||
+        u.programs.some(p =>
+          p.en.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          p.ar.includes(searchTerm)
+        )
+      )
     )
-  }
+  })
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-2 sm:px-4 py-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">
-            {t(translations.locations.en, translations.locations.ar)}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">
+            {language === 'ar' ? 'أفضل الوجهات الدراسية' : 'Top Study Destinations'}
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            {t(
-              'Explore our beautiful destinations where you can enjoy luxury yacht experiences',
-              'استكشف وجهاتنا الجميلة حيث يمكنك الاستمتاع بتجارب اليخوت الفاخرة'
-            )}
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            {language === 'ar'
+              ? 'استكشف أفضل الدول للدراسة وأشهر الجامعات والبرامج لكل وجهة.'
+              : 'Explore the best countries for study, top universities, and programs in each destination.'}
           </p>
         </div>
 
@@ -76,7 +48,7 @@ export const Locations: React.FC = () => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
-              placeholder={t('Search locations...', 'البحث في المواقع...')}
+              placeholder={language === 'ar' ? 'ابحث عن دولة أو جامعة أو برنامج...' : 'Search for a country, university, or program...'}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -87,49 +59,58 @@ export const Locations: React.FC = () => {
         {/* Results Count */}
         <div className="mb-6 text-center">
           <p className="text-muted-foreground">
-            {t('Showing', 'عرض')} {filteredLocations.length} {t('of', 'من')} {locations.length} {t('locations', 'موقع')}
+            {language === 'ar'
+              ? `عرض ${filteredCountries.length} من ${countries.length} وجهة`
+              : `Showing ${filteredCountries.length} of ${countries.length} destinations`}
           </p>
         </div>
 
-        {/* Locations Grid */}
-        {filteredLocations.length === 0 ? (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <div className="text-muted-foreground">
-                <Anchor className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                <p className="text-lg mb-4">
-                  {t(translations.noLocationsFound.en, translations.noLocationsFound.ar)}
-                </p>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setSearchTerm('')}
-                >
-                  {t('Clear Search', 'مسح البحث')}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Countries Grid */}
+        {filteredCountries.length === 0 ? (
+          <div className="text-center py-12">
+            <GraduationCap className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+            <p className="text-lg mb-4 text-muted-foreground">
+              {language === 'ar' ? 'لا توجد وجهات مطابقة للبحث.' : 'No destinations found.'}
+            </p>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredLocations.map((location) => (
-              <Card key={location.id} className="hover:shadow-lg transition-shadow">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredCountries.map((country) => (
+              <Card key={country.code} className="hover:shadow-lg transition-shadow flex flex-col h-full">
                 <CardHeader>
-                  <div className="flex items-center space-x-2">
-                    <MapPin className="h-5 w-5 text-primary" />
+                  <div className="flex items-center gap-2 mb-2">
+                    <GraduationCap className="h-6 w-6 text-primary" />
                     <CardTitle className="text-xl">
-                      {language === 'ar' ? location.name_ar : location.name_en}
+                      {language === 'ar' ? country.ar : country.en}
                     </CardTitle>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground mb-6">
-                    {language === 'ar' ? location.description_ar : location.description_en}
+                  <p className="text-muted-foreground text-sm mb-2">
+                    {language === 'ar' ? country.description_ar : country.description_en}
                   </p>
-                  <Button asChild className="w-full">
-                    <Link to={`/locations/${location.id}`}>
-                      {t('Explore Location', 'استكشف الموقع')}
-                    </Link>
-                  </Button>
+                </CardHeader>
+                <CardContent className="flex-1 flex flex-col gap-4">
+                  <div>
+                    <h3 className="font-semibold text-base mb-2 flex items-center gap-1">
+                      <School className="h-4 w-4 text-primary" />
+                      {language === 'ar' ? 'أشهر الجامعات' : 'Top Universities'}
+                    </h3>
+                    <ul className="space-y-2">
+                      {country.universities.map((uni, idx) => (
+                        <li key={idx} className="bg-gray-100 rounded p-2">
+                          <div className="font-medium">
+                            {language === 'ar' ? uni.ar : uni.en}
+                          </div>
+                          <div className="mt-1 text-xs text-muted-foreground">
+                            <BookOpen className="inline h-3 w-3 mr-1 text-primary align-text-bottom" />
+                            {language === 'ar' ? 'أفضل البرامج:' : 'Top Programs:'}
+                            <span className="ml-1">
+                              {uni.programs.map(p => language === 'ar' ? p.ar : p.en).join('، ')}
+                            </span>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </CardContent>
               </Card>
             ))}
